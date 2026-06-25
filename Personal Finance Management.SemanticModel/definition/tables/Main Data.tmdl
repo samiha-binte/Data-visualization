@@ -1,0 +1,95 @@
+table 'Main Data'
+	lineageTag: 34a6fbe2-ffc1-4add-97da-8496dd4a92e2
+
+	measure 'YTD expense' = TOTALYTD(sum('Main Data'[Amount]),'Main Data'[Bill Due Date])
+		formatString: 0
+		lineageTag: 9515db2f-7f64-48a0-81ec-22be278841ae
+
+	measure 'total expenses' = ```
+			CALCULATE(sum('Main Data'[Amount]),'Main Data'[Status]="Unpaid") 
+			```
+		formatString: 0
+		lineageTag: 389b84c0-ffac-427e-80a7-e92e670d72fe
+
+	column Month
+		dataType: string
+		lineageTag: db6927d7-a610-4513-a356-09e18971d4f5
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Main Type'
+		dataType: string
+		lineageTag: c1333b2a-b86f-4222-b588-7c808beb76d7
+		summarizeBy: none
+		sourceColumn: Main Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 82a8f0e5-08fd-4055-b586-0554438e7039
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sub-category
+		dataType: string
+		lineageTag: 27c6c5f7-f046-4fef-becd-981edf9ed00a
+		summarizeBy: none
+		sourceColumn: Sub-category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: int64
+		formatString: 0
+		lineageTag: f381f68e-0614-47d6-b03d-6ea93b679fde
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bill Due Date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: ad7a62f7-f7d3-471d-aed1-9779506d5dff
+		summarizeBy: none
+		sourceColumn: Bill Due Date
+
+		variation Variation
+			isDefault
+			relationship: 39ce4da1-6034-4feb-a1f6-90cf58fddd47
+			defaultHierarchy: LocalDateTable_beae0077-d354-4bb0-80e1-66ee0150de0d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Status
+		dataType: string
+		lineageTag: 93bfcfe8-ad04-4820-a56e-ff980b8bd21b
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Main Data' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\User\Desktop\udemy power bi projects\Personal financial Dataset\Dataset.xlsx"), null, true),
+				    #"Main Data_Sheet" = Source{[Item="Main Data",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#"Main Data_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Month", type text}, {"Main Type", type text}, {"Category", type text}, {"Sub-category", type text}, {"Amount", Int64.Type}, {"Bill Due Date", type date}, {"Status", type text}}),
+				    #"Replaced Value" = Table.ReplaceValue(#"Changed Type",null,"Unpaid",Replacer.ReplaceValue,{"Status"}),
+				    #"Filtered Rows" = Table.SelectRows(#"Replaced Value", each [Bill Due Date] <> null and [Bill Due Date] <> "")
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

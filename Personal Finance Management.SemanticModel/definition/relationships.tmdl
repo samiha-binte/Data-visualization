@@ -1,0 +1,9 @@
+relationship 39ce4da1-6034-4feb-a1f6-90cf58fddd47
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'Main Data'.'Bill Due Date'
+	toColumn: LocalDateTable_beae0077-d354-4bb0-80e1-66ee0150de0d.Date
+
+relationship AutoDetected_2ccaaf3d-0b3c-4b00-b63e-3f04369214b1
+	fromColumn: 'Main Data'.Month
+	toColumn: 'Income Goal'.Month
+

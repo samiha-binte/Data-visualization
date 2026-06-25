@@ -1,0 +1,56 @@
+table Sheet4
+	lineageTag: 66523067-af6c-4b9e-9c89-731756259e73
+
+	column 'Row Labels'
+		dataType: string
+		lineageTag: d4531deb-f169-40cf-bf96-d2e9e386f785
+		summarizeBy: none
+		sourceColumn: Row Labels
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sum of Amount'
+		dataType: int64
+		formatString: 0
+		lineageTag: 65e1c3cb-e997-47e8-b43f-c299b245ec81
+		summarizeBy: sum
+		sourceColumn: Sum of Amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Row Labels_1'
+		dataType: string
+		lineageTag: 488d914c-7270-4158-8352-580ef5c2ee8a
+		summarizeBy: none
+		sourceColumn: Row Labels_1
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Sum of Amount_2'
+		dataType: int64
+		formatString: 0
+		lineageTag: 641c953f-69f4-4c32-9156-93eb9431033b
+		summarizeBy: sum
+		sourceColumn: Sum of Amount_2
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Sheet4 = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\User\Desktop\udemy power bi projects\Personal financial Dataset\Dataset.xlsx"), null, true),
+				    Sheet4_Sheet = Source{[Item="Sheet4",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(Sheet4_Sheet, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Main Type", type text}, {"Expenses", type any}, {"Column3", type any}, {"Column4", type any}, {"Main Type_1", type text}, {"Income", type any}}),
+				    #"Removed Top Rows" = Table.Skip(#"Changed Type",1),
+				    #"Promoted Headers1" = Table.PromoteHeaders(#"Removed Top Rows", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers1",{{"Row Labels", type text}, {"Sum of Amount", Int64.Type}, {"Column3", type any}, {"Column4", type any}, {"Row Labels_1", type text}, {"Sum of Amount_2", Int64.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type1",{"Column3", "Column4"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+
