@@ -2,6 +2,8 @@
 
 A **Power BI dashboard** designed to help individuals track, analyze, and understand their personal finances — including income, expenses, bill statuses, and spending trends across categories and months.
 
+![Dashboard Preview](udm.png)
+
 
 ## 📊 Overview
 
